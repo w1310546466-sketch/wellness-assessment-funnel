@@ -4,10 +4,11 @@
 
 ## 1. 生产环境变量
 
-Vercel 或其他生产环境只需要配置：
+Vercel 或其他生产环境需要配置：
 
 ```text
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?schema=public"
+DATABASE_URL="postgresql://USER.PROJECT_REF:PASSWORD@REGION.pooler.supabase.com:6543/postgres?schema=public"
+DIRECT_URL="postgresql://postgres:PASSWORD@db.PROJECT_REF.supabase.co:5432/postgres?schema=public"
 ```
 
 生产环境不要配置：
@@ -20,7 +21,9 @@ APP_DATA_MODE="memory"
 
 - `APP_DATA_MODE=memory` 只用于本地演示、测试和 CI。
 - 线上必须使用 PostgreSQL，否则刷新、冷启动或实例切换会丢失数据。
-- `DATABASE_URL` 只能放在服务端环境变量中，不要使用 `NEXT_PUBLIC_` 前缀。
+- `DATABASE_URL` 可以使用 Supabase pooler，适合 Vercel 运行时连接；transaction pooler 常见端口是 `6543`。
+- `DIRECT_URL` 使用 Supabase direct connection，供 Prisma migration 使用；direct connection 常见端口是 `5432`。
+- `DATABASE_URL` 和 `DIRECT_URL` 只能放在服务端环境变量中，不要使用 `NEXT_PUBLIC_` 前缀。
 
 可参考根目录的 `.env.production.example`。
 
@@ -32,14 +35,15 @@ APP_DATA_MODE="memory"
 
 1. 创建 Supabase 项目或其他 PostgreSQL 数据库。
 2. 复制 PostgreSQL connection string。
-3. 在本地或部署环境设置 `DATABASE_URL`。
-4. 执行 migration：
+3. 如果使用 Supabase，建议 `DATABASE_URL` 使用 pooler 连接，`DIRECT_URL` 使用 direct connection。
+4. 在本地或部署环境设置 `DATABASE_URL` 和 `DIRECT_URL`。
+5. 执行 migration：
 
 ```bash
 npm run prisma:deploy
 ```
 
-如果本地要先验证真实数据库链路，可以临时在 `.env` 中设置真实 `DATABASE_URL`，并移除 `APP_DATA_MODE=memory`，然后运行：
+如果本地要先验证真实数据库链路，可以临时在 `.env` 中设置真实 `DATABASE_URL` 和 `DIRECT_URL`，并移除 `APP_DATA_MODE=memory`，然后运行：
 
 ```bash
 npm run prisma:deploy
@@ -54,7 +58,7 @@ npm run build
 2. 在 Vercel 导入该 GitHub 仓库。
 3. Framework Preset 选择 Next.js。
 4. Node.js 版本使用 22。
-5. 在 Vercel Project Settings 中添加 `DATABASE_URL`。
+5. 在 Vercel Project Settings 中添加 `DATABASE_URL` 和 `DIRECT_URL`。
 6. 不要添加 `APP_DATA_MODE`。
 7. 部署后访问 `/funnel` 验证完整流程。
 

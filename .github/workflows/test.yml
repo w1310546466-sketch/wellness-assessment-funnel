@@ -11,6 +11,7 @@ jobs:
     env:
       APP_DATA_MODE: memory
       DATABASE_URL: postgresql://user:password@localhost:5432/ruiqi?schema=public
+      DIRECT_URL: postgresql://user:password@localhost:5432/ruiqi?schema=public
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

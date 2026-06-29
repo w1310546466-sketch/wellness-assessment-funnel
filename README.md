@@ -49,7 +49,7 @@ npm run dev
 APP_DATA_MODE="memory"
 ```
 
-如果要使用真实数据库，请设置 `DATABASE_URL`，并移除 `APP_DATA_MODE=memory`。
+如果要使用真实数据库，请设置 `DATABASE_URL` 和 `DIRECT_URL`，并移除 `APP_DATA_MODE=memory`。
 
 如果 npm registry 下载较慢，可以使用：
 
@@ -81,7 +81,8 @@ prisma/migrations/20260629144500_init/migration.sql
 
 ```bash
 cp .env.example .env
-# 将 DATABASE_URL 设置为 PostgreSQL 连接字符串
+# 将 DATABASE_URL 设置为 Supabase pooler 连接字符串，通常端口是 6543
+# 将 DIRECT_URL 设置为 Supabase direct connection，通常端口是 5432
 # 移除 APP_DATA_MODE=memory
 npx prisma generate
 npx prisma migrate dev
@@ -98,7 +99,10 @@ npm run build
 环境变量规则：
 
 - PostgreSQL 模式必须配置 `DATABASE_URL`。
+- Supabase/Vercel 部署时，`DATABASE_URL` 建议使用 pooler 连接，常见端口是 `6543`。
+- `DIRECT_URL` 使用 direct connection，常见端口是 `5432`，供 Prisma migration 使用。
 - `DATABASE_URL` 只允许服务端使用，不要加 `NEXT_PUBLIC_` 前缀。
+- `DIRECT_URL` 也只允许服务端使用，不要加 `NEXT_PUBLIC_` 前缀。
 - 生产环境不要设置 `APP_DATA_MODE=memory`。
 - 生产环境如果缺少 `DATABASE_URL`，应用会直接报错，避免误用内存数据库导致数据丢失。
 - 可以使用 Supabase 托管的 PostgreSQL。
@@ -274,7 +278,7 @@ Playwright 当前覆盖：
 ## 上线前 Checklist
 
 - README 已填写线上 Demo URL、GitHub 仓库链接、CI 状态和已支付测试会话说明。
-- 已配置 Supabase/PostgreSQL `DATABASE_URL`。
+- 已配置 Supabase/PostgreSQL `DATABASE_URL` 和 `DIRECT_URL`。
 - 已执行 `npx prisma migrate deploy`。
 - Vercel/生产环境没有设置 `APP_DATA_MODE=memory`。
 - 线上 `/funnel` 可以从头走到结果页。
@@ -304,7 +308,7 @@ AnonymousUser 1:N PaymentEvent
 - Cookie 使用 `sameSite=lax`。
 - 生产环境 Cookie 使用 `secure=true`。
 - 客户端代码不能直接读取或写入 `rq_session`。
-- `DATABASE_URL` 只允许服务端使用，不能使用 `NEXT_PUBLIC_` 暴露到浏览器。
+- `DATABASE_URL` 和 `DIRECT_URL` 只允许服务端使用，不能使用 `NEXT_PUBLIC_` 暴露到浏览器。
 - MVP 不使用 Supabase Auth。
 
 ## Wellness Estimate 说明
