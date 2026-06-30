@@ -136,7 +136,7 @@ export function FunnelClient() {
     <main className="app-shell">
       <section className="funnel-grid">
         <div className="funnel-copy">
-          <p className="eyebrow">Ruiqi Wellness Estimate</p>
+          <p className="eyebrow">Wellness Assessment Funnel</p>
           <h1>Build a steadier plan from a few simple signals.</h1>
           <p className="lead">
             Your estimate updates as you move through the funnel and stays saved for your next visit.
@@ -328,4 +328,3 @@ function isStepReady(step: StepKey, values: FunnelValues): boolean {
 
   return [values.age, values.heightCm, values.weightKg, values.targetWeightKg].every((value) => Number(value) > 0);
 }
-

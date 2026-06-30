@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Ruiqi Wellness Estimate",
-  description: "A full-stack health assessment funnel challenge implementation."
+  title: "Wellness Assessment Funnel",
+  description: "A full-stack health assessment funnel with anonymous progress recovery and mock subscription unlock."
 };
 
 export default function RootLayout({
@@ -17,4 +17,3 @@ export default function RootLayout({
     </html>
   );
 }
-

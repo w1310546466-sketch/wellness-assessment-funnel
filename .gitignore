@@ -9,5 +9,6 @@ test-results
 *.log
 .agents/
 .codex/
+AGENTS.md
 skills-lock.json
 *.docx
