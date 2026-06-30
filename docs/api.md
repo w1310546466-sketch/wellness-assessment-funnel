@@ -332,8 +332,7 @@ mock 支付接口。
   "ok": true,
   "data": {
     "status": "ok",
-    "service": "ruiqi-health-funnel"
+    "service": "wellness-assessment-funnel"
   }
 }
 ```
-
