@@ -207,6 +207,17 @@ curl -i -c cookies.txt -b cookies.txt http://localhost:3000/api/results
 
 本项目使用 HttpOnly `rq_session` cookie，因此已支付测试会话不是 URL query 中的 `sessionId`，而是浏览器 cookie 或 cURL cookie jar。
 
+固定的线上已支付演示 session：
+
+```bash
+BASE_URL="https://wellness-assessment-funnel.vercel.app"
+PAID_RQ_SESSION="5a55c5aa-1028-48b2-8e26-75c769e4c2f8"
+
+curl -i -H "Cookie: rq_session=$PAID_RQ_SESSION" "$BASE_URL/api/results"
+```
+
+这枚 `rq_session` 是专门用于评审和演示的匿名测试 cookie，已完成测评并通过 mock `/api/pay` 解锁。它等价于本项目里的测试 session 标识，但不会作为 URL query 中的 `sessionId` 暴露。如果该演示 cookie 被清理或过期，可以使用下面的 cookie-jar 流程重新创建一个新的已支付测试会话。
+
 线上创建一个已支付测试会话：
 
 ```bash
