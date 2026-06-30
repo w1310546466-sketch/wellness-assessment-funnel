@@ -1,5 +1,7 @@
 # Wellness Assessment Funnel
 
+[![test](https://github.com/w1310546466-sketch/wellness-assessment-funnel/actions/workflows/test.yml/badge.svg)](https://github.com/w1310546466-sketch/wellness-assessment-funnel/actions/workflows/test.yml)
+
 一个全栈健康测评 funnel 项目，覆盖匿名会话、分步保存、进度恢复、服务端评估算法、订阅态结果解锁和自动化测试。
 
 项目重点不是复刻复杂健康 App，而是展示一条完整、可验证的工程主链路：
@@ -16,12 +18,12 @@
 
 ## 项目链接
 
-当前本地 MVP 已跑通，线上部署后可补充演示地址：
+当前本地与线上主流程均已验证：
 
-- 线上 Demo URL：待部署
+- 线上 Demo URL：https://wellness-assessment-funnel.vercel.app/
 - GitHub 仓库链接：https://github.com/w1310546466-sketch/wellness-assessment-funnel
-- 已支付测试会话说明：见“已支付测试 Session”章节，部署后可补充线上 cookie-jar/cURL 示例
-- CI 状态：待 GitHub Actions 首次运行后确认
+- 已支付测试会话说明：见“已支付测试 Session”章节，可用线上 cookie-jar/cURL 流程复现
+- CI 状态：见上方 GitHub Actions badge
 
 ## 技术栈
 
@@ -205,19 +207,48 @@ curl -i -c cookies.txt -b cookies.txt http://localhost:3000/api/results
 
 本项目使用 HttpOnly `rq_session` cookie，因此已支付测试会话不是 URL query 中的 `sessionId`，而是浏览器 cookie 或 cURL cookie jar。
 
-本地创建一个已支付测试会话：
+线上创建一个已支付测试会话：
 
 ```bash
-curl -i -c paid-session.cookies -b paid-session.cookies -X POST http://localhost:3000/api/sessions
-# 完成四个 PATCH 步骤并 submit，或者在浏览器中走完整 funnel
+BASE_URL="https://wellness-assessment-funnel.vercel.app"
+
+curl -i -c paid-session.cookies -b paid-session.cookies -X POST "$BASE_URL/api/sessions"
+
 curl -i -c paid-session.cookies -b paid-session.cookies \
-  -X POST http://localhost:3000/api/pay \
+  -X PATCH "$BASE_URL/api/assessments/current/steps/gender" \
+  -H "content-type: application/json" \
+  -d "{\"gender\":\"FEMALE\"}"
+
+curl -i -c paid-session.cookies -b paid-session.cookies \
+  -X PATCH "$BASE_URL/api/assessments/current/steps/goal" \
+  -H "content-type: application/json" \
+  -d "{\"goal\":\"LOSE_WEIGHT\"}"
+
+curl -i -c paid-session.cookies -b paid-session.cookies \
+  -X PATCH "$BASE_URL/api/assessments/current/steps/body" \
+  -H "content-type: application/json" \
+  -d "{\"age\":30,\"heightCm\":165,\"weightKg\":70,\"targetWeightKg\":64}"
+
+curl -i -c paid-session.cookies -b paid-session.cookies \
+  -X PATCH "$BASE_URL/api/assessments/current/steps/activity" \
+  -H "content-type: application/json" \
+  -d "{\"activityLevel\":\"MODERATE\"}"
+
+curl -i -c paid-session.cookies -b paid-session.cookies -X POST "$BASE_URL/api/assessments/current/submit"
+
+# Before mock payment: redacted result.
+curl -i -c paid-session.cookies -b paid-session.cookies "$BASE_URL/api/results"
+
+curl -i -c paid-session.cookies -b paid-session.cookies \
+  -X POST "$BASE_URL/api/pay" \
   -H "content-type: application/json" \
   -d "{\"source\":\"paid_test_session\"}"
-curl -i -c paid-session.cookies -b paid-session.cookies http://localhost:3000/api/results
+
+# After mock payment: full result.
+curl -i -c paid-session.cookies -b paid-session.cookies "$BASE_URL/api/results"
 ```
 
-线上演示时，可以提供线上 URL，并附上一组已支付浏览器会话说明，或提供可复现 paid 状态的 cookie-jar/cURL 流程。
+这组命令会在 `paid-session.cookies` 中保存 `rq_session`，用于复现付费前后的差异化返回。`rq_session` 是 HttpOnly cookie，不作为 URL query 中的 `sessionId` 暴露。
 
 ## 测试覆盖
 
